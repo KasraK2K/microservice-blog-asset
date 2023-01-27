@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
-import { Logger } from '@nestjs/common'
+import { Logger, VersioningType } from '@nestjs/common'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
@@ -8,10 +8,14 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3003
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter())
+  app.enableVersioning({
+    defaultVersion: process.env.DEFAULT_API_VERSION,
+    type: VersioningType.URI
+  })
 
   await app
     .listen(port, '0.0.0.0')
-    .then(() => logger.log(`Asset service is running on port ${port}`))
+    .then(() => logger.log(`Asset service version ${process.env.DEFAULT_API_VERSION} is running on port ${port}`))
     .catch((error) => logger.error(error))
 }
 bootstrap()
